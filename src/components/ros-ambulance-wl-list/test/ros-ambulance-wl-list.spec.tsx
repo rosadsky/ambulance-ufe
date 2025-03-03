@@ -8,7 +8,7 @@ describe('ros-ambulance-wl-list', () => {
       html: `<ros-ambulance-wl-list></ros-ambulance-wl-list>`,
     });
 
-      const wlList = page.rootInstance as PfxAmbulanceWlList;
+      const wlList = page.rootInstance as RosAmbulanceWlList;
       const expectedPatients = wlList?.waitingPatients?.length
 
       const items = page.root.shadowRoot.querySelectorAll("md-list-item");
