@@ -12,7 +12,8 @@ declare global {
 export class RosAmbulanceWlApp {
 
   @State() private relativePath = "";
-
+  @Prop() apiBase: string;
+  @Prop() ambulanceId: string;
   @Prop() basePath: string="";
 
   componentWillLoad() {
@@ -55,7 +56,8 @@ export class RosAmbulanceWlApp {
           ? <ros-ambulance-wl-editor entry-id={entryId}
           oneditor-closed={ () => navigate("./list")} >
           </ros-ambulance-wl-editor>
-          : <ros-ambulance-wl-list onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
+          : <ros-ambulance-wl-list  ambulance-id={this.ambulanceId} api-base={this.apiBase}
+            onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
 
           </ros-ambulance-wl-list>
         }

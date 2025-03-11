@@ -21,6 +21,16 @@ export namespace Components {
         "middle": string;
     }
     interface RosAmbulanceWlApp {
+        "ambulanceId": string;
+        /**
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
+         */
+        "ambulance-id"?: string;
+        "apiBase": string;
+        /**
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
+         */
+        "api-base"?: string;
         "basePath": string;
         /**
          * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
@@ -35,6 +45,16 @@ export namespace Components {
         "entry-id"?: string;
     }
     interface RosAmbulanceWlList {
+        "ambulanceId": string;
+        /**
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
+         */
+        "ambulance-id"?: string;
+        "apiBase": string;
+        /**
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
+         */
+        "api-base"?: string;
     }
 }
 export interface RosAmbulanceWlEditorCustomEvent<T> extends CustomEvent<T> {
@@ -115,6 +135,16 @@ declare namespace LocalJSX {
         "middle"?: string;
     }
     interface RosAmbulanceWlApp {
+        "ambulanceId"?: string;
+        /**
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
+         */
+        "ambulance-id"?: string;
+        "apiBase"?: string;
+        /**
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
+         */
+        "api-base"?: string;
         "basePath"?: string;
         /**
          * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
@@ -130,6 +160,16 @@ declare namespace LocalJSX {
         "onEditor-closed"?: (event: RosAmbulanceWlEditorCustomEvent<string>) => void;
     }
     interface RosAmbulanceWlList {
+        "ambulanceId"?: string;
+        /**
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
+         */
+        "ambulance-id"?: string;
+        "apiBase"?: string;
+        /**
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
+         */
+        "api-base"?: string;
         "onEntry-clicked"?: (event: RosAmbulanceWlListCustomEvent<string>) => void;
     }
     interface IntrinsicElements {
