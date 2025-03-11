@@ -11,7 +11,7 @@ import { RosAmbulanceWlApp } from '../ros-ambulance-wl-app';
     });
     page.win.navigation = new EventTarget()
     const child = await page.root.shadowRoot.firstElementChild;
-    expect(child.tagName.toLocaleLowerCase()).toEqual ("<pfx>-ambulance-wl-editor");
+    expect(child.tagName.toLocaleLowerCase()).toEqual ("ros-ambulance-wl-editor");
 
   });
 
@@ -23,6 +23,6 @@ import { RosAmbulanceWlApp } from '../ros-ambulance-wl-app';
     });
     page.win.navigation = new EventTarget()
     const child = await page.root.shadowRoot.firstElementChild;
-    expect(child.tagName.toLocaleLowerCase()).toEqual("<pfx>-ambulance-wl-list");
+    expect(child.tagName.toLocaleLowerCase()).toEqual("ros-ambulance-wl-list");
   });
 });
