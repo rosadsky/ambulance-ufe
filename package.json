@@ -57,6 +57,9 @@
     "open-api-mocker": "^2.0.0",
     "puppeteer": "^21.9.0"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "*"
+  },
   "license": "MIT",
   "dependencies": {
     "@material/web": "^2.2.0"
