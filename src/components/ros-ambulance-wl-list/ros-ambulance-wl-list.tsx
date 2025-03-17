@@ -45,12 +45,12 @@ async componentWillLoad() {
           ? <div class="error">{this.errorMessage}</div>
           :
           <md-list>
-            {this.waitingPatients.map(patient =>
-              <md-list-item onClick={ () => this.entryClicked.emit(patient.id)} >
+            {this.waitingPatients.map((patient) =>
+              <md-list-item onClick={() => this.entryClicked.emit(patient.id)}>
                 <div slot="headline">{patient.name}</div>
-                <div slot="supporting-text">{"Predpokladaný vstup: " + patient.estimatedStart?.toLocaleString()}</div>
+                <div slot="supporting-text">{'Predpokladaný vstup: ' + patient.estimatedStart?.toLocaleString()}</div>
                 <md-icon slot="start">person</md-icon>
-              </md-list-item>
+              </md-list-item>,
             )}
           </md-list>
         }

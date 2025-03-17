@@ -54,6 +54,7 @@ export class RosAmbulanceWlApp {
       <Host>
         { element === "editor"
           ? <ros-ambulance-wl-editor entry-id={entryId}
+                                     ambulance-id={this.ambulanceId} api-base={this.apiBase}
           oneditor-closed={ () => navigate("./list")} >
           </ros-ambulance-wl-editor>
           : <ros-ambulance-wl-list  ambulance-id={this.ambulanceId} api-base={this.apiBase}
