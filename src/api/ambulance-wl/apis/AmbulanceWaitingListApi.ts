@@ -22,6 +22,11 @@ import {
     WaitingListEntryToJSON,
 } from '../models';
 
+export interface CreateWaitingListEntryRequest {
+    ambulanceId: string;
+    waitingListEntry: WaitingListEntry;
+}
+
 export interface DeleteWaitingListEntryRequest {
     ambulanceId: string;
     entryId: string;
@@ -49,6 +54,23 @@ export interface UpdateWaitingListEntryRequest {
  * @interface AmbulanceWaitingListApiInterface
  */
 export interface AmbulanceWaitingListApiInterface {
+    /**
+     * Use this method to store new entry into the waiting list.
+     * @summary Saves new entry into waiting list
+     * @param {string} ambulanceId pass the id of the particular ambulance
+     * @param {WaitingListEntry} waitingListEntry Waiting list entry to store
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmbulanceWaitingListApiInterface
+     */
+    createWaitingListEntryRaw(requestParameters: CreateWaitingListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WaitingListEntry>>;
+
+    /**
+     * Use this method to store new entry into the waiting list.
+     * Saves new entry into waiting list
+     */
+    createWaitingListEntry(requestParameters: CreateWaitingListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WaitingListEntry>;
+
     /**
      * Use this method to delete the specific entry from the waiting list.
      * @summary Deletes specific entry
@@ -123,6 +145,45 @@ export interface AmbulanceWaitingListApiInterface {
  * 
  */
 export class AmbulanceWaitingListApi extends runtime.BaseAPI implements AmbulanceWaitingListApiInterface {
+
+    /**
+     * Use this method to store new entry into the waiting list.
+     * Saves new entry into waiting list
+     */
+    async createWaitingListEntryRaw(requestParameters: CreateWaitingListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WaitingListEntry>> {
+        if (requestParameters.ambulanceId === null || requestParameters.ambulanceId === undefined) {
+            throw new runtime.RequiredError('ambulanceId','Required parameter requestParameters.ambulanceId was null or undefined when calling createWaitingListEntry.');
+        }
+
+        if (requestParameters.waitingListEntry === null || requestParameters.waitingListEntry === undefined) {
+            throw new runtime.RequiredError('waitingListEntry','Required parameter requestParameters.waitingListEntry was null or undefined when calling createWaitingListEntry.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/waiting-list/{ambulanceId}/entries`.replace(`{${"ambulanceId"}}`, encodeURIComponent(String(requestParameters.ambulanceId))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: WaitingListEntryToJSON(requestParameters.waitingListEntry),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WaitingListEntryFromJSON(jsonValue));
+    }
+
+    /**
+     * Use this method to store new entry into the waiting list.
+     * Saves new entry into waiting list
+     */
+    async createWaitingListEntry(requestParameters: CreateWaitingListEntryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WaitingListEntry> {
+        const response = await this.createWaitingListEntryRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Use this method to delete the specific entry from the waiting list.

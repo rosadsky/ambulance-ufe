@@ -1,5 +1,5 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
-import { AmbulanceWaitingListApi, WaitingListEntry, Configuration } from '../../api/ambulance-wl';
+import { AmbulanceWaitingListApi, AmbulanceConditionsApi, WaitingListEntry, Configuration, Condition} from '../../api/ambulance-wl';
 
 @Component({
   tag: 'ros-ambulance-wl-editor',
@@ -15,6 +15,7 @@ export class RosAmbulanceWlEditor {
 
   @State() private duration = 15
   @State() entry: WaitingListEntry;
+  @State() conditions: Condition[];
   @State() errorMessage: string;
   @State() isValid: boolean;
 
@@ -22,9 +23,21 @@ export class RosAmbulanceWlEditor {
 
   async componentWillLoad() {
     this.getWaitingEntryAsync();
+    this.getConditions();
   }
 
   private async getWaitingEntryAsync(): Promise<WaitingListEntry> {
+    if(this.entryId === "@new") {
+      this.isValid = false;
+      this.entry = {
+        id: "@new",
+        patientId: "",
+        waitingSince: new Date(Date.now()),
+        estimatedDurationMinutes: 15
+      };
+      return this.entry;
+    }
+
     if (!this.entryId) {
       this.isValid = false;
       return undefined
@@ -51,6 +64,29 @@ export class RosAmbulanceWlEditor {
       this.errorMessage = `Cannot retrieve list of waiting patients: ${err.message || "unknown"}`
     }
     return undefined;
+  }
+
+  private async getConditions(): Promise<Condition[]> {
+    try {
+      const configuration = new Configuration({
+        basePath: this.apiBase,
+      });
+
+      const conditionsApi = new AmbulanceConditionsApi(configuration);
+
+      const response = await conditionsApi.getConditionsRaw({ambulanceId: this.ambulanceId})
+      if (response.raw.status < 299) {
+        this.conditions = await response.value();
+      }
+    } catch (err: any) {
+      // no strong dependency on conditions
+    }
+    // always have some fallback condition
+    return this.conditions || [{
+      code: "fallback",
+      value: "Neurčený dôvod návštevy",
+      typicalDurationMinutes: 15,
+    }];
   }
 
   private handleSliderInput(event: Event) {
@@ -93,27 +129,7 @@ export class RosAmbulanceWlEditor {
             <md-icon slot="leading-icon">watch_later</md-icon>
           </md-filled-text-field>
 
-          <md-filled-select label="Dôvod návštevy"
-                            value={this.entry?.condition?.code}
-                            oninput={(ev: InputEvent) => {
-                              if (this.entry) {
-                                this.entry.condition.code = this.handleInputEvent(ev)
-                              }
-                            }}>
-            <md-icon slot="leading-icon">sick</md-icon>
-            <md-select-option value="folowup">
-              <div slot="headline">Kontrola</div>
-            </md-select-option>
-            <md-select-option value="nausea">
-              <div slot="headline">Nevoľnosť</div>
-            </md-select-option>
-            <md-select-option value="fever">
-              <div slot="headline">Horúčka</div>
-            </md-select-option>
-            <md-select-option value="ache-in-throat">
-              <div slot="headline">Bolesti hrdla</div>
-            </md-select-option>
-          </md-filled-select>
+          {this.renderConditions()}
         </form>
 
         <div class="duration-slider">
@@ -135,7 +151,7 @@ export class RosAmbulanceWlEditor {
         <md-divider inset></md-divider>
 
         <div class="actions">
-          <md-filled-tonal-button id="delete" disabled={!this.entry}
+          <md-filled-tonal-button id="delete" disabled={!this.entry || this.entry?.id === "@new" }
                                   onClick={() => this.deleteEntry()}>
             <md-icon slot="icon">delete</md-icon>
             Zmazať
@@ -178,12 +194,9 @@ export class RosAmbulanceWlEditor {
       });
 
       const waitingListApi = new AmbulanceWaitingListApi(configuration);
-
-      const response = await waitingListApi.updateWaitingListEntryRaw({
-        ambulanceId: this.ambulanceId,
-        entryId: this.entryId,
-        waitingListEntry: this.entry
-      });
+      const response = this.entryId == "@new" ?
+      await waitingListApi.createWaitingListEntryRaw({ambulanceId: this.ambulanceId, waitingListEntry: this.entry}) :
+      await waitingListApi.updateWaitingListEntryRaw({ambulanceId: this.ambulanceId, entryId: this.entryId, waitingListEntry: this.entry});
 
       if (response.raw.status < 299) {
         this.editorClosed.emit("store")
@@ -192,6 +205,50 @@ export class RosAmbulanceWlEditor {
       }
     } catch (err: any) {
       this.errorMessage = `Cannot store entry: ${err.message || "unknown"}`
+    }
+  }
+
+  private renderConditions() {
+    let conditions = this.conditions || [];
+    // we want to have this.entry`s condition in the selection list
+    if (this.entry?.condition) {
+      const index = conditions.findIndex(condition => condition.code === this.entry.condition.code)
+      if (index < 0) {
+        conditions = [this.entry.condition, ...conditions]
+      }
+    }
+    return (
+      <md-filled-select label="Dôvod návštevy"
+                        display-text={this.entry?.condition?.value}
+                        oninput={(ev: InputEvent) => this.handleCondition(ev)} >
+        <md-icon slot="leading-icon">sick</md-icon>
+        {this.entry?.condition?.reference ?
+          <md-icon slot="trailing-icon" class="link"
+                   onclick={()=> window.open(this.entry.condition.reference, "_blank")}>
+            open_in_new
+          </md-icon>
+          : undefined
+        }
+        {conditions.map(condition => {
+          return (
+            <md-select-option
+              value={condition.code}
+              selected={condition.code === this.entry?.condition?.code}>
+              <div slot="headline">{condition.value}</div>
+            </md-select-option>
+          )
+        })}
+      </md-filled-select>
+    );
+  }
+
+  private handleCondition(ev: InputEvent) {
+    if(this.entry) {
+      const code = this.handleInputEvent(ev)
+      const condition = this.conditions.find(condition => condition.code === code);
+      this.entry.condition = Object.assign({}, condition);
+      this.entry.estimatedDurationMinutes = condition.typicalDurationMinutes;
+      this.duration = condition.typicalDurationMinutes;
     }
   }
 
@@ -217,4 +274,5 @@ export class RosAmbulanceWlEditor {
     }
   }
 }
+
 

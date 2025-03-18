@@ -3,7 +3,7 @@ import { RosAmbulanceWlEditor } from '../ros-ambulance-wl-editor';
   import fetchMock from 'jest-fetch-mock';
   import { Condition, WaitingListEntry } from '../../../api/ambulance-wl';
 
-  describe('<pfx>-ambulance-wl-editor', () => {
+  describe('ros-ambulance-wl-editor', () => {
     const sampleEntry: WaitingListEntry = {
     id: "entry-1",
     patientId: "p-1",
@@ -52,7 +52,7 @@ import { RosAmbulanceWlEditor } from '../ros-ambulance-wl-editor';
 
     const page = await newSpecPage({
     components: [RosAmbulanceWlEditor],
-    html: `<ros-ambulance-wl-editor entry-id="test-entry" ambulance-id="test-ambulance" api-base="http://sample.test/api"></ros>-ambulance-wl-editor>`,
+    html: `<ros-ambulance-wl-editor entry-id="test-entry" ambulance-id="test-ambulance" api-base="http://sample.test/api"></ros-ambulance-wl-editor>`,
     });
 
     await delay(300);
