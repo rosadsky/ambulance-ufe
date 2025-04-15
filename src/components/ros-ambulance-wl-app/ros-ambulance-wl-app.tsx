@@ -15,7 +15,6 @@ export class RosAmbulanceWlApp {
   @Prop() basePath: string="";
   @Prop() apiBase: string;
   @Prop() ambulanceId: string;
-
   componentWillLoad() {
     const baseUri = new URL(this.basePath, document.baseURI || "/").pathname;
 
